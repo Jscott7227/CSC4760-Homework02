@@ -11,7 +11,7 @@ int main(int argc, char* argv[]) {
       int rank, size;
       MPI_Comm_rank(MPI_COMM_WORLD, &rank);
       MPI_Comm_size(MPI_COMM_WORLD, &size);
-
+	
       // Make View and init values
       int N = 20;
       Kokkos::View<int*> A("A", N);
@@ -20,7 +20,7 @@ int main(int argc, char* argv[]) {
       {
         Kokkos::parallel_for("Loop1", A.extent(0), KOKKOS_LAMBDA (const int i) {
         //Asign value to A
-		    A(i) = (i+3)*i;
+		    A(i) = (i*3)+(i*4);
         });
 
         // Send View values with MPI functions
@@ -28,10 +28,10 @@ int main(int argc, char* argv[]) {
 
       }
 
-      else
-      {
+      if (1 == rank)
+      { 
         // Recive View
-        MPI_Recv(A.data(), A.size(), MPI_INT, 1, 0, MPI_COMM_WORLD);
+        MPI_Recv(A.data(), A.size(), MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
         // Output
         for (int i = 0; i < A.size(); i++)
@@ -39,10 +39,9 @@ int main(int argc, char* argv[]) {
           std::cout << A[i] << ", ";
         }
 
+	std::cout << std::endl;
+
       }
-
-
-    printf("\nhello world\n");
     }
     Kokkos::finalize();
     MPI_Finalize();
