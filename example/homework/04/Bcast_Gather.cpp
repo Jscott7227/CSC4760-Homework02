@@ -5,7 +5,7 @@ using namespace std;
 
 int main(int argc, char **argv)
 {
-    cout << "MPI allreduce";
+    
     int rank, size;
     
     MPI_Init(&argc, &argv);
@@ -17,7 +17,7 @@ int main(int argc, char **argv)
 
     sendval = (float)rank;
 
-    MPI_Gather(&sendval, 1, MPI_FLOAT, recvbuf, 1, MPI_FLOAT, MPI_SUM, 0, MPI_COMM_WORLD);
+    MPI_Gather(&sendval, 1, MPI_FLOAT, recvbuf, 1, MPI_FLOAT, 0, MPI_COMM_WORLD);
     MPI_Bcast(recvbuf, 5, MPI_FLOAT, 0, MPI_COMM_WORLD);
 
     cout << rank << ": ";

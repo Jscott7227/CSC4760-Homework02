@@ -7,40 +7,37 @@ using namespace std;
 
 int main(int argc, char **argv)
 {
-    cout << "MPI allreduce";
-    int rank0, size;
+    int rank, size;
     
     MPI_Init(&argc, &argv);
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank0);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 
-    //First split not right fix later
-    char subcommunicator;
-    int color;
-    int key;
-    int Q = 2;
-
-    color = rank0 % Q;
-    key = rank0;
+    int color1, color2;
+    //Assign P and Q assume size is a multiple of P
+    int P = 2;
+    int Q = size/ P;
+    
+    //First split should be split into groups either 1 or 0 
+    color1 = rank / Q;
 
     MPI_Comm comm1;
-    MPI_Comm_split(MPI_COMM_WORLD, color, key, &comm1);
+    MPI_Comm_split(MPI_COMM_WORLD, color1, rank, &comm1);
 
-    int rank1;
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank1);
+  
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-    //Second Split should be correct
-    color = rank1 % Q;
-    key = rank1;
+    //Second Split splits the processes into size / 2 different sections
+    color2 = rank % Q;
 
     MPI_Comm comm2;
-    MPI_Comm_split(MPI_COMM_WORLD, color, key, &comm2);
+    MPI_Comm_split(MPI_COMM_WORLD, color2, rank, &comm2);
 
-    int rank2;
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank2);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-    printf("Oringinal Rank: %d \nFirst split Rank: %d \nSecond split Rank: %d", rank0, rank1, rank2);
+    cout << "Rank: " << rank << " Group: " << color1 << " Section: "<< color2 << endl;
 
     MPI_Finalize();
     return 0;
+ 
 }
